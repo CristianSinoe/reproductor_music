@@ -4,28 +4,29 @@
  */
 package GUI;
 
+import DOMAIN.Song;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
+import java.util.List;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.List;
-
+import java.io.File;
 
 /**
  *
  * @author sinoe
  */
 public class PlayerPanel extends JPanel {
-    private final JLabel lblNowPlaying = new JLabel("Reproduciendo: Ninguna");
-    private final DefaultListModel<String> songListModel = new DefaultListModel<>();
-    private final JList<String> songList = new JList<>(songListModel);
+    private final JLabel lblNowPlaying = new JLabel("REPRODUCIENDO: NINGUNA");
+    private final DefaultListModel<Song> songListModel = new DefaultListModel<>();
+    private final JList<Song> songList = new JList<>(songListModel);
 
-    private final JButton btnPlay = new JButton("▶️ Play");
-    private final JButton btnPause = new JButton("⏸ Pause");
-    private final JButton btnNext = new JButton("⏭ Next");
-    private final JButton btnPrev = new JButton("⏮ Prev");
-
+    private final JButton btnPlay = new JButton("▶️ PLAY");
+    private final JButton btnPause = new JButton("⏸ PAUSA");
+    private final JButton btnNext = new JButton("⏭ SIGUIENTE");
+    private final JButton btnPrev = new JButton("⏮ ANTERIOR");
+    
+    private final JLabel lblCoverLarge = new JLabel();
     private final JTabbedPane tabbedPane = new JTabbedPane();
 
     public PlayerPanel() {
@@ -37,8 +38,10 @@ public class PlayerPanel extends JPanel {
         lblNowPlaying.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         songList.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        songList.setCellRenderer(new SongListRenderer()); // Aquí asignas el renderer personalizado
+
         JScrollPane scrollPane = new JScrollPane(songList);
-        scrollPane.setBorder(BorderFactory.createTitledBorder("🎶 Canciones"));
+        scrollPane.setBorder(BorderFactory.createTitledBorder("🎶 CANCIONES"));
 
         JPanel controls = new JPanel(new FlowLayout(FlowLayout.CENTER));
         controls.add(btnPrev);
@@ -50,11 +53,16 @@ public class PlayerPanel extends JPanel {
         songsPanel.add(scrollPane, BorderLayout.CENTER);
         songsPanel.add(controls, BorderLayout.SOUTH);
 
-        tabbedPane.addTab("Canciones", songsPanel);
-        tabbedPane.addTab("Álbumes", new JLabel("Próximamente..."));
-        tabbedPane.addTab("Artistas", new JLabel("Próximamente..."));
-        tabbedPane.addTab("Años", new JLabel("Próximamente..."));
-        tabbedPane.addTab("Playlists", new JLabel("Próximamente..."));
+        tabbedPane.addTab("CANCIONES", songsPanel);
+        tabbedPane.addTab("ALBUMES", new JLabel("PROXIMAMENTE..."));
+        tabbedPane.addTab("ARTISTAS", new JLabel("PROXIMAMENTE..."));
+        tabbedPane.addTab("AÑOS", new JLabel("PROXIMAMENTE..."));
+        tabbedPane.addTab("PLAYLIST", new JLabel("PROXIMAMENTE..."));
+        
+        lblCoverLarge.setHorizontalAlignment(SwingConstants.CENTER);
+lblCoverLarge.setPreferredSize(new Dimension(200, 200));
+lblCoverLarge.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
+add(lblCoverLarge, BorderLayout.WEST);
 
         add(lblNowPlaying, BorderLayout.NORTH);
         add(tabbedPane, BorderLayout.CENTER);
@@ -72,23 +80,58 @@ public class PlayerPanel extends JPanel {
         });
     }
 
-    public void setNowPlaying(String songName) {
-        lblNowPlaying.setText("🎵 Reproduciendo: " + songName);
+    // Cambiado para recibir lista completa de objetos Song
+    public void setSongs(List<Song> songs) {
+    songListModel.clear();
+
+    for (Song s : songs) {
+        songListModel.addElement(s);
     }
+    songList.revalidate();
+    tabbedPane.setSelectedIndex(0); // Esto es correcto
+}
 
-    public void setSongs(List<String> songs) {
-        songListModel.clear();
-        songs.forEach(songListModel::addElement);
 
-        songList.revalidate(); // 🔧 Forzar refresco visual
-        songList.repaint();
-
-        tabbedPane.setSelectedIndex(0); // 🔧 Mostrar pestaña de Canciones
-    }
-
-    public JList<String> getSongList() {
+    public JList<Song> getSongList() {
         return songList;
     }
+
+    public void setNowPlaying(String songName) {
+    lblNowPlaying.setText("REPRODUCIENDO: " + songName);
+
+    Song song = null;
+    for (int i = 0; i < songListModel.size(); i++) {
+        Song s = songListModel.get(i);
+        if (s.getName().equals(songName)) {
+            song = s;
+            break;
+        }
+    }
+
+    if (song != null && song.getMetadata() != null) {
+        String coverPath = song.getMetadata().getCoverImagePath();
+        if (coverPath != null && !coverPath.isBlank()) {
+            new Thread(() -> {
+                try {
+                    File file = new File(coverPath);
+                    if (file.exists()) {
+                        ImageIcon icon = new ImageIcon(file.toURI().toURL());
+                        Image img = icon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+                        ImageIcon scaledIcon = new ImageIcon(img);
+                        SwingUtilities.invokeLater(() -> lblCoverLarge.setIcon(scaledIcon));
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error cargando carátula actual: " + e.getMessage());
+                }
+            }).start();
+        } else {
+            lblCoverLarge.setIcon(null); // o un ícono por defecto
+        }
+    } else {
+        lblCoverLarge.setIcon(null);
+    }
+}
+
 
     public interface PlaySongListener {
         void playSongAt(int index);
@@ -100,19 +143,19 @@ public class PlayerPanel extends JPanel {
         this.playSongListener = listener;
     }
 
-    public void setPlayAction(ActionListener listener) {
+    public void setPlayAction(java.awt.event.ActionListener listener) {
         btnPlay.addActionListener(listener);
     }
 
-    public void setPauseAction(ActionListener listener) {
+    public void setPauseAction(java.awt.event.ActionListener listener) {
         btnPause.addActionListener(listener);
     }
 
-    public void setNextAction(ActionListener listener) {
+    public void setNextAction(java.awt.event.ActionListener listener) {
         btnNext.addActionListener(listener);
     }
 
-    public void setPrevAction(ActionListener listener) {
+    public void setPrevAction(java.awt.event.ActionListener listener) {
         btnPrev.addActionListener(listener);
     }
 }

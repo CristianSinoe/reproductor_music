@@ -4,15 +4,11 @@
  */
 package LOGIC;
 
+import DOMAIN.MetadataExtractor;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.stream.Collectors;
-
 import DOMAIN.Song;
 import DOMAIN.SongMetadata;
-import com.mpatric.mp3agic.ID3v1;
-import com.mpatric.mp3agic.ID3v2;
-import com.mpatric.mp3agic.Mp3File;
 import java.io.File;
 
 
@@ -24,55 +20,28 @@ public class MusicManager {
     private final List<Song> allSongs = Collections.synchronizedList(new ArrayList<>());
     private final ExecutorService executor = Executors.newFixedThreadPool(8);
 
-    public void loadSongsFromFolder(File folder) throws InterruptedException, ExecutionException {
-        allSongs.clear();
-        List<File> files = listAllMp3Files(folder);
+    
+    public List<Song> loadSongsFromFolder(File folder) {
+    List<Song> songs = new ArrayList<>();
+    File[] files = folder.listFiles();
 
-        System.out.println("MP3 encontrados en carpeta: " + files.size());
+    if (files != null) {
+        for (File file : files) {
+            if (file.isFile() && file.getName().toLowerCase().endsWith(".mp3")) {
+                SongMetadata metadata = MetadataExtractor.extractMetadata(file);
+                Song song = new Song(file.getName(), file, metadata);
 
-        List<Future<Song>> futures = new ArrayList<>();
-        for (File f : files) {
-            Future<Song> future = executor.submit(() -> {
-                SongMetadata metadata = extractMetadata(f);
-                return new Song(f.getName(), f, metadata);
-            });
-            futures.add(future);
-        }
+                // 🟩 Aquí agregas los println
+                System.out.println("Cargando canción: " + song.getName());
+                System.out.println("Cover path asignado: " + song.getMetadata().getCoverImagePath());
 
-        for (Future<Song> f : futures) {
-            allSongs.add(f.get());
-        }
-    }
-
-    private SongMetadata extractMetadata(File mp3File) {
-        try {
-            Mp3File mp3 = new Mp3File(mp3File);
-            String artist = "Desconocido";
-            String album = "Desconocido";
-            int year = 0;
-
-            if (mp3.hasId3v2Tag()) {
-                ID3v2 tag = mp3.getId3v2Tag();
-                artist = tag.getArtist() != null ? tag.getArtist() : artist;
-                album = tag.getAlbum() != null ? tag.getAlbum() : album;
-                try {
-                    year = Integer.parseInt(tag.getYear());
-                } catch (NumberFormatException e) {}
-            } else if (mp3.hasId3v1Tag()) {
-                ID3v1 tag = mp3.getId3v1Tag();
-                artist = tag.getArtist() != null ? tag.getArtist() : artist;
-                album = tag.getAlbum() != null ? tag.getAlbum() : album;
-                try {
-                    year = Integer.parseInt(tag.getYear());
-                } catch (NumberFormatException e) {}
+                songs.add(song);
             }
-
-            return new SongMetadata(artist, album, year);
-
-        } catch (Exception e) {
-            return new SongMetadata("Desconocido", "Desconocido", 0);
         }
     }
+
+    return songs;
+}
 
     private List<File> listAllMp3Files(File folder) {
         List<File> files = new ArrayList<>();

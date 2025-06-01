@@ -21,9 +21,9 @@ public class PlaylistManager {
         if (!dir.exists()) {
             boolean created = dir.mkdirs();
             if (created) {
-                System.out.println("Directorio de playlists creado en: " + dir.getAbsolutePath());
+                System.out.println("DIRECTORIO CREADO EN: " + dir.getAbsolutePath());
             } else {
-                System.out.println("No se pudo crear el directorio de playlists o ya existe.");
+                System.out.println("NO SE PUDO CREAR EL DIRECTORIO DE PLAYLIST O YA EXISTE");
             }
         }
     }
@@ -37,8 +37,7 @@ public class PlaylistManager {
                 Playlist p = Playlist.loadFromFile(f);
                 if (p != null) playlists.add(p);
             } catch (Exception e) {
-                System.err.println("Error cargando playlist desde " + f.getName() + ": " + e.getMessage());
-                // Opcional: borrar archivo corrupto o ignorar
+                System.err.println("ERROR CARGANDO PLAYLIST DESDE " + f.getName() + ": " + e.getMessage());
             }
         }
     }

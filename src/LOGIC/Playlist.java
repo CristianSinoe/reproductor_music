@@ -4,11 +4,11 @@
  */
 package LOGIC;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import DOMAIN.Song;
-
 import java.io.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,14 +21,12 @@ public class Playlist {
     private String name;
     private List<Song> songs = new ArrayList<>();
 
-    // Constructor vacío para Gson
     public Playlist() {}
 
     public Playlist(String name) {
         this.name = name;
     }
 
-    // Getters y setters
     public String getName() {
         return name;
     }
@@ -53,28 +51,47 @@ public class Playlist {
         songs.remove(song);
     }
 
-    // Guarda playlist en archivo JSON
     public void saveToFile(File dir) throws IOException {
         if (!dir.exists()) {
             dir.mkdirs();
         }
         File file = new File(dir, sanitizeFileName(name) + ".json");
-        Gson gson = new Gson();
+
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT)
+                .setPrettyPrinting()
+                .create();
+
         try (Writer writer = new FileWriter(file)) {
             gson.toJson(this, writer);
         }
     }
 
-    // Carga playlist desde archivo JSON
     public static Playlist loadFromFile(File file) throws IOException {
-        Gson gson = new Gson();
-        try (Reader reader = new FileReader(file)) {
-            Type playlistType = new TypeToken<Playlist>() {}.getType();
-            return gson.fromJson(reader, playlistType);
-        }
-    }
+    Gson gson = new GsonBuilder()
+            .excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT)
+            .create();
 
-    // Evita caracteres inválidos en el nombre para el archivo
+    try (Reader reader = new FileReader(file)) {
+        Type playlistType = new TypeToken<Playlist>() {}.getType();
+        Playlist playlist = gson.fromJson(reader, playlistType);
+
+        // 💡 Rellenar metadatos de cada canción
+        for (Song song : playlist.getSongs()) {
+            File songFile = song.getFile();
+            if (songFile != null && songFile.exists()) {
+                song.setMetadata(DOMAIN.MetadataExtractor.extractMetadata(songFile));
+                System.out.println("🎵 Metadata restaurada: " + song.getName() + " -> " + song.getMetadata().getCoverImagePath());
+            } else {
+                System.out.println("⚠️ Archivo no encontrado: " + song.getFilePath());
+            }
+        }
+
+        return playlist;
+    }
+}
+
+
     private String sanitizeFileName(String input) {
         return input.replaceAll("[\\\\/:*?\"<>|]", "_");
     }

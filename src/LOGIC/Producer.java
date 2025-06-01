@@ -5,7 +5,6 @@
 package LOGIC;
 
 import DOMAIN.Song;
-import java.io.File;
 
 /**
  *
@@ -25,7 +24,7 @@ public class Producer extends Thread {
         try {
             for (Song s : manager.getAllSongs()) {
                 buffer.addSong(s);
-                System.out.println("Agregado al buffer: " + s.getName());
+                System.out.println("AGREGANDO AL BUFFER: " + s.getName());
                 Thread.sleep(100);
             }
         } catch (InterruptedException e) {

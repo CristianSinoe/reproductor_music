@@ -12,21 +12,49 @@ public class SongMetadata {
     private String artist;
     private String album;
     private int year;
+    private String coverImagePath;
 
-    public SongMetadata(String artist, String album, int year) {
+    public SongMetadata(String artist, String album, int year, String coverImagePath) {
         this.artist = artist;
         this.album = album;
         this.year = year;
+        this.coverImagePath = coverImagePath;
     }
 
-    // Getters y setters
-    public String getArtist() { return artist; }
-    public String getAlbum() { return album; }
-    public int getYear() { return year; }
+    public String getArtist() { 
+        return artist;
+    }
+    
+    public void setArtist(String artist) {
+        this.artist = artist;
+    }
+    
+    public String getAlbum() {
+        return album;
+    }
+
+    public void setAlbum(String album) {
+        this.album = album;
+    }
+    
+    public int getYear() {
+        return year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
+    }
+
+    public String getCoverImagePath() {
+        return coverImagePath;
+    }
+
+    public void setCoverImagePath(String coverImagePath) {
+        this.coverImagePath = coverImagePath;
+    }
 
     @Override
     public String toString() {
         return artist + " - " + album + " (" + year + ")";
     }
 }
-

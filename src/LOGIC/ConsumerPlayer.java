@@ -8,7 +8,6 @@ import DOMAIN.Song;
 import javazoom.jl.player.Player;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  *
@@ -48,91 +47,93 @@ public class ConsumerPlayer extends Thread {
         notify();
     }
 
-    public void stopPlayback() {
-    stopped = true;
-    songChanged = true;
-    interrupt(); // Interrumpe si está en wait()
-    // Dejamos que run() limpie los recursos
-}
-
     public synchronized void changeSong() {
         songChanged = true;
+        paused = false; 
+        notify();        
+        interrupt();     
+    }
+
+    public synchronized void stopPlayback() {
+        stopped = true;
+        songChanged = true;
         notify();
-        interrupt(); // Interrumpe si está en wait()
-        // Dejamos que run() maneje la limpieza y la reproducción
+        interrupt();
     }
 
     @Override
-public void run() {
-    while (!stopped) {
-        try {
-            synchronized (this) {
-                while (paused && !stopped) wait();
-                if (stopped) break;
-            }
-
-            Song song = playbackManager.getNextSong();
-            if (song == null) {
-                Thread.sleep(500);
-                continue;
-            }
-
-            if (callback != null) {
-                javax.swing.SwingUtilities.invokeLater(() -> callback.onSongChanged(song.getName()));
-            }
-
-            // Limpieza previa
-            synchronized (playerLock) {
-                if (currentStream != null) {
-                    try { currentStream.close(); } catch (IOException e) { e.printStackTrace(); }
-                    currentStream = null;
+    public void run() {
+        while (!stopped) {
+            try {
+                synchronized (this) {
+                    while (paused && !stopped) wait();
+                    if (stopped) break;
                 }
-                if (currentPlayer != null) {
-                    currentPlayer.close();
+
+                Song song;
+                synchronized (this) {
+                    if (songChanged) {
+                        song = playbackManager.getCurrentSong();
+                        songChanged = false;
+                    } else {
+                        song = playbackManager.getCurrentSong();
+                    }
+                }
+
+                if (song == null) {
+                    Thread.sleep(500);
+                    continue;
+                }
+
+                if (callback != null) {
+                    javax.swing.SwingUtilities.invokeLater(() -> callback.onSongChanged(song.getName()));
+                }
+
+                synchronized (playerLock) {
+                    if (currentStream != null) {
+                        try { currentStream.close(); } catch (IOException e) { e.printStackTrace(); }
+                        currentStream = null;
+                    }
+                    if (currentPlayer != null) {
+                        currentPlayer.close();
+                        currentPlayer = null;
+                    }
+
+                    currentStream = new FileInputStream(song.getFile());
+                    currentPlayer = new Player(currentStream);
+                }
+
+                currentPlayer.play();
+
+                synchronized (playerLock) {
+                    if (currentStream != null) {
+                        try { currentStream.close(); } catch (IOException e) { e.printStackTrace(); }
+                        currentStream = null;
+                    }
                     currentPlayer = null;
                 }
 
-                // Inicialización para la nueva canción
-                currentStream = new FileInputStream(song.getFile());
-                currentPlayer = new Player(currentStream);
-            }
-
-            // Reproduce la canción (bloqueante hasta que termine)
-            currentPlayer.play();
-
-            // Limpieza después de la reproducción
-            synchronized (playerLock) {
-                if (currentStream != null) {
-                    try { currentStream.close(); } catch (IOException e) { e.printStackTrace(); }
-                    currentStream = null;
+                synchronized (this) {
+                    if (!songChanged && !stopped) {
+                        wait(); 
+                    }
                 }
+
+            } catch (InterruptedException e) {
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        synchronized (playerLock) {
+            if (currentPlayer != null) {
+                currentPlayer.close();
                 currentPlayer = null;
             }
-
-            synchronized (this) {
-                if (!songChanged && !stopped) {
-                    wait();  // Espera hasta que se cambie la canción o se detenga
-                }
-                songChanged = false;
+            if (currentStream != null) {
+                try { currentStream.close(); } catch (IOException e) { e.printStackTrace(); }
+                currentStream = null;
             }
-
-        } catch (InterruptedException e) {
-            // Permite la interrupción para cambiar o detener la canción
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
-
-    // Limpieza final de recursos
-    synchronized (playerLock) {
-        if (currentPlayer != null) {
-            currentPlayer.close();
-            currentPlayer = null;
-        }
-        if (currentStream != null) {
-            try { currentStream.close(); } catch (IOException e) { e.printStackTrace(); }
-            currentStream = null;
-        }
-    }
-}
 }

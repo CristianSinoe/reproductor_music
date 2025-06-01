@@ -4,16 +4,18 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/DOMAIN/Song.java</file>
-            <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/LOGIC/ConsumerPlayer.java</file>
             <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/GUI/App.java</file>
             <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/LOGIC/PlaybackManager.java</file>
-            <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/LOGIC/Playlist.java</file>
-            <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/GUI/MainWindow.java</file>
             <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/LOGIC/MusicManager.java</file>
             <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/LOGIC/PlaylistManager.java</file>
             <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/DOMAIN/SongMetadata.java</file>
-            <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/LOGIC/MusicBuffer.java</file>
+            <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/DOMAIN/MetadataExtractor.java</file>
             <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/LOGIC/Producer.java</file>
+            <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/LOGIC/ConsumerPlayer.java</file>
+            <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/LOGIC/Playlist.java</file>
+            <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/GUI/MainWindow.java</file>
+            <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/LOGIC/MusicBuffer.java</file>
+            <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/GUI/SongListRenderer.java</file>
             <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/GUI/PlayerPanel.java</file>
         </group>
     </open-files>

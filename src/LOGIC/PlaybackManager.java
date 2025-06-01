@@ -6,7 +6,6 @@ package LOGIC;
 
 import DOMAIN.Song;
 
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -51,43 +50,35 @@ public class PlaybackManager {
     public void setCurrentIndex(int currentIndex) {
         this.currentIndex = currentIndex;
     }
-    
-    
 
-    public Song getNextSong() {
+    public Song getCurrentSong() {
         if (currentPlaylist == null || currentPlaylist.getSongs().isEmpty()) {
             return null;
         }
+        return currentPlaylist.getSongs().get(currentIndex);
+    }
 
+    public void next() {
+        if (currentPlaylist == null || currentPlaylist.getSongs().isEmpty()) return;
         if (mode == Mode.SEQUENTIAL) {
-            Song song = currentPlaylist.getSongs().get(currentIndex);
             currentIndex = (currentIndex + 1) % currentPlaylist.getSongs().size();
-            return song;
-        } else { // SHUFFLE
-            int index = random.nextInt(currentPlaylist.getSongs().size());
-            return currentPlaylist.getSongs().get(index);
+        } else {
+            currentIndex = random.nextInt(currentPlaylist.getSongs().size());
         }
     }
 
-    public Song getPreviousSong() {
-        if (currentPlaylist == null || currentPlaylist.getSongs().isEmpty()) {
-            return null;
-        }
-
+    public void previous() {
+        if (currentPlaylist == null || currentPlaylist.getSongs().isEmpty()) return;
         if (mode == Mode.SEQUENTIAL) {
             currentIndex = (currentIndex - 1 + currentPlaylist.getSongs().size()) % currentPlaylist.getSongs().size();
-            return currentPlaylist.getSongs().get(currentIndex);
-        } else { // SHUFFLE
-            int index = random.nextInt(currentPlaylist.getSongs().size());
-            return currentPlaylist.getSongs().get(index);
+        } else {
+            currentIndex = random.nextInt(currentPlaylist.getSongs().size());
         }
     }
-    
+
     public void playSongAtIndex(int index) {
-    if (currentPlaylist == null || currentPlaylist.getSongs().isEmpty()) return;
-    if (index < 0 || index >= currentPlaylist.getSongs().size()) return;
-    currentIndex = index;
+        if (currentPlaylist == null || currentPlaylist.getSongs().isEmpty()) return;
+        if (index < 0 || index >= currentPlaylist.getSongs().size()) return;
+        currentIndex = index;
+    }
 }
-
-}
-
