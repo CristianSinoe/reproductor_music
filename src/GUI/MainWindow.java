@@ -41,7 +41,6 @@ public class MainWindow extends JFrame {
 
     private Playlist activePlaylist;
 
-    // Timer para actualizar barra de progreso
     private Timer progressTimer;
 
     public MainWindow() {

@@ -9,6 +9,7 @@
             <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/GUI/App.java</file>
             <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/LOGIC/PlaybackManager.java</file>
             <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/LOGIC/MusicManager.java</file>
+            <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/LOGIC/PlaylistManager.java</file>
             <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/DOMAIN/SongMetadata.java</file>
             <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/DOMAIN/MetadataExtractor.java</file>
             <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/LOGIC/Producer.java</file>
@@ -16,7 +17,9 @@
             <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/GUI/NowPlayingWindow.java</file>
             <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/DOMAIN/ImageCache.java</file>
             <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/resources/images/next.png</file>
+            <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/LOGIC/Playlist.java</file>
             <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/GUI/MainWindow.java</file>
+            <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/LOGIC/MusicBuffer.java</file>
             <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/GUI/SongListRenderer.java</file>
             <file>file:/C:/Users/sinoe/OneDrive/Documentos/NetBeansProjects/REPRODUCTOR_MUSIC/src/GUI/PlayerPanel.java</file>
         </group>
