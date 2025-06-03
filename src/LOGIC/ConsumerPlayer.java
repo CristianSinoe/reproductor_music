@@ -15,7 +15,7 @@ import java.io.IOException;
  */
 public class ConsumerPlayer extends Thread {
 
-    private PlaybackManager playbackManager;
+    private final PlaybackManager playbackManager;
     private NowPlayingCallback callback;
 
     private volatile boolean paused = false;
@@ -25,6 +25,14 @@ public class ConsumerPlayer extends Thread {
     private Player currentPlayer = null;
     private FileInputStream currentStream = null;
     private final Object playerLock = new Object();
+
+    private Thread playThread;
+
+    // Para controlar progreso basado en tiempo
+    private long startTime = 0;
+    private long pausedTimeAccumulated = 0;
+    private long pauseStartTime = 0;
+    private int durationMillis = 0; // Debes establecer la duración al cargar la canción
 
     public interface NowPlayingCallback {
         void onSongChanged(String songName);
@@ -38,20 +46,51 @@ public class ConsumerPlayer extends Thread {
         this.callback = callback;
     }
 
+    public void setDuration(int millis) {
+        this.durationMillis = millis;
+    }
+
+    public synchronized int getProgressPercent() {
+        if (durationMillis == 0) return 0;
+        long played;
+        if (paused) {
+            played = pauseStartTime - startTime - pausedTimeAccumulated;
+        } else {
+            long now = System.currentTimeMillis();
+            played = now - startTime - pausedTimeAccumulated;
+        }
+        int percent = (int) ((played * 100) / durationMillis);
+        return Math.min(percent, 100);
+    }
+
     public synchronized void pause() {
-        paused = true;
+        if (!paused) {
+            paused = true;
+            pauseStartTime = System.currentTimeMillis();
+            synchronized (playerLock) {
+                if (currentPlayer != null) {
+                    currentPlayer.close();  // Pausa efectiva (detener la reproducción)
+                }
+            }
+        }
     }
 
     public synchronized void play() {
-        paused = false;
-        notify();
+        if (paused) {
+            paused = false;
+            pausedTimeAccumulated += System.currentTimeMillis() - pauseStartTime;
+            songChanged = true;  // Forzar reinicio de reproducción
+            notify();
+            interrupt();
+        }
     }
 
     public synchronized void changeSong() {
         songChanged = true;
-        paused = false; 
-        notify();        
-        interrupt();     
+        paused = false;
+        pausedTimeAccumulated = 0;
+        notify();
+        interrupt();
     }
 
     public synchronized void stopPlayback() {
@@ -59,6 +98,19 @@ public class ConsumerPlayer extends Thread {
         songChanged = true;
         notify();
         interrupt();
+    }
+
+    // NUEVOS métodos públicos para que NowPlayingWindow pueda controlar la reproducción
+    public Song getCurrentSong() {
+        return playbackManager.getCurrentSong();
+    }
+
+    public void next() {
+        playbackManager.next();
+    }
+
+    public void previous() {
+        playbackManager.previous();
     }
 
     @Override
@@ -89,37 +141,82 @@ public class ConsumerPlayer extends Thread {
                     javax.swing.SwingUtilities.invokeLater(() -> callback.onSongChanged(song.getName()));
                 }
 
+                // Aquí debes establecer la duración de la canción si tienes ese dato
+                if (song.getDurationMillis() > 0) {
+                    setDuration(song.getDurationMillis());
+                } else {
+                    setDuration(0); // Sin dato
+                }
+
+                startTime = System.currentTimeMillis();
+                pausedTimeAccumulated = 0;
+
                 synchronized (playerLock) {
-                    if (currentStream != null) {
-                        try { currentStream.close(); } catch (IOException e) { e.printStackTrace(); }
-                        currentStream = null;
-                    }
                     if (currentPlayer != null) {
                         currentPlayer.close();
                         currentPlayer = null;
                     }
-
+                    if (currentStream != null) {
+                        try {
+                            currentStream.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        currentStream = null;
+                    }
                     currentStream = new FileInputStream(song.getFile());
                     currentPlayer = new Player(currentStream);
                 }
 
-                currentPlayer.play();
+                Player playerToPlay;
+                synchronized (playerLock) {
+                    playerToPlay = currentPlayer;
+                }
+
+                playThread = new Thread(() -> {
+                    try {
+                        if (playerToPlay != null) {
+                            playerToPlay.play();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+                playThread.start();
+
+                while (playThread.isAlive()) {
+                    if (songChanged || stopped || paused) {
+                        synchronized (playerLock) {
+                            if (playerToPlay != null) {
+                                playerToPlay.close();
+                            }
+                        }
+                        playThread.interrupt();
+                        break;
+                    }
+                    Thread.sleep(100);
+                }
 
                 synchronized (playerLock) {
                     if (currentStream != null) {
-                        try { currentStream.close(); } catch (IOException e) { e.printStackTrace(); }
+                        try {
+                            currentStream.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         currentStream = null;
                     }
                     currentPlayer = null;
                 }
 
                 synchronized (this) {
-                    if (!songChanged && !stopped) {
-                        wait(); 
+                    if (!songChanged && !stopped && !paused) {
+                        wait();
                     }
                 }
 
             } catch (InterruptedException e) {
+                // Ignorar interrupciones
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -131,7 +228,11 @@ public class ConsumerPlayer extends Thread {
                 currentPlayer = null;
             }
             if (currentStream != null) {
-                try { currentStream.close(); } catch (IOException e) { e.printStackTrace(); }
+                try {
+                    currentStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 currentStream = null;
             }
         }

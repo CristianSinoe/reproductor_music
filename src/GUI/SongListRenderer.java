@@ -29,16 +29,16 @@ import java.util.concurrent.Executors;
 public class SongListRenderer extends JPanel implements ListCellRenderer<Song> {
 
     private static final ImageIcon DEFAULT_ICON = new ImageIcon(
-        SongListRenderer.class.getResource("/resources/images/default_cover.jpg")
+        SongListRenderer.class.getResource("/resources/images/default_cover02.png")
     );
 
-    private static final int IMAGE_SIZE = 500;
+    private static final int IMAGE_SIZE = 200;
 
     // Cache con límite de 200 entradas
     private static final Map<String, ImageIcon> coverCache = new LinkedHashMap<>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry<String, ImageIcon> eldest) {
-            return size() > 500;
+            return size() > 20;
         }
     };
 

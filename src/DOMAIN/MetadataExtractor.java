@@ -8,6 +8,16 @@ import com.mpatric.mp3agic.*;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.function.Consumer;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import javax.imageio.ImageIO;
+import java.io.IOException;
+
 
 /**
  *
@@ -15,7 +25,20 @@ import java.io.FileOutputStream;
  */
 public class MetadataExtractor {
 
+    private static final int MAX_THREADS = 6;
+    private static final ExecutorService executor = Executors.newFixedThreadPool(MAX_THREADS);
+
+    public static void extractMetadataAsync(File mp3File, Consumer<SongMetadata> callback) {
+        executor.submit(() -> {
+            SongMetadata metadata = extractMetadata(mp3File);
+            if (callback != null) {
+                callback.accept(metadata);
+            }
+        });
+    }
+
     public static SongMetadata extractMetadata(File mp3File) {
+        SongMetadata meta = new SongMetadata();
         try {
             Mp3File mp3 = new Mp3File(mp3File);
 
@@ -25,63 +48,52 @@ public class MetadataExtractor {
             String coverPath = null;
 
             if (mp3.hasId3v2Tag()) {
-                System.out.println(mp3File.getName() + " tiene etiqueta ID3v2");
                 ID3v2 id3v2Tag = mp3.getId3v2Tag();
 
                 artist = id3v2Tag.getArtist() != null ? id3v2Tag.getArtist() : artist;
                 album = id3v2Tag.getAlbum() != null ? id3v2Tag.getAlbum() : album;
+                year = id3v2Tag.getYear() != null ? Integer.parseInt(id3v2Tag.getYear()) : year;
 
-                try {
-                    year = Integer.parseInt(id3v2Tag.getYear());
-                } catch (NumberFormatException e) {
-                }
+                byte[] albumImageData = id3v2Tag.getAlbumImage();
+                if (albumImageData != null) {
+                    String coverFileName = "cover_" + mp3File.getName().replace(".mp3", ".jpg");
+                    File coverFile = new File("covers", coverFileName);
+                    coverFile.getParentFile().mkdirs();
 
-                byte[] imageData = id3v2Tag.getAlbumImage();
-                if (imageData != null) {
-                    System.out.println(mp3File.getName() + " tiene imagen embebida, tamaño: " + imageData.length);
-
-                    String coverDirPath = System.getProperty("user.home") + "/MyMusicPlayer/covers/";
-                    File coverDir = new File(coverDirPath);
-                    if (!coverDir.exists()) {
-                        boolean created = coverDir.mkdirs();
-                        System.out.println("Carpeta para carátulas creada: " + created);
+                    try (InputStream in = new ByteArrayInputStream(albumImageData)) {
+                        BufferedImage originalImage = ImageIO.read(in);
+                        if (originalImage != null) {
+                            BufferedImage resizedImage = resize(originalImage, 200, 200);
+                            ImageIO.write(resizedImage, "jpg", coverFile);
+                            coverPath = coverFile.getAbsolutePath();
+                        }
+                    } catch (IOException ex) {
+                        System.err.println("Error redimensionando imagen: " + mp3File.getName() + " -> " + ex.getMessage());
                     }
-
-                    String safeName = mp3File.getName().replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
-                    File imgFile = new File(coverDir, "cover_" + safeName + ".jpg");
-
-                    try (FileOutputStream fos = new FileOutputStream(imgFile)) {
-                        fos.write(imageData);
-                    }
-
-                    coverPath = imgFile.getAbsolutePath();
-                    System.out.println("Carátula guardada en: " + coverPath);
-                } else {
-                    System.out.println(mp3File.getName() + " NO tiene imagen embebida");
-                }
-            } else {
-                System.out.println(mp3File.getName() + " NO tiene etiqueta ID3v2");
-            }
-
-            if (coverPath == null) {
-                File dir = mp3File.getParentFile();
-                File coverFile = new File(dir, "cover.jpg");
-                if (!coverFile.exists()) {
-                    coverFile = new File(dir, "folder.jpg");
-                }
-                if (coverFile.exists()) {
-                    coverPath = coverFile.getAbsolutePath();
-                    System.out.println("Carátula externa encontrada en: " + coverPath);
-                } else {
-                    System.out.println("No se encontró carátula externa para " + mp3File.getName());
                 }
             }
 
-            return new SongMetadata(artist, album, year, coverPath);
+            meta.setArtist(artist);
+            meta.setAlbum(album);
+            meta.setYear(year);
+            meta.setCoverImagePath(coverPath);
 
         } catch (Exception e) {
-            e.printStackTrace();
-            return new SongMetadata("Desconocido", "Desconocido", 0, null);
+            System.err.println("Error leyendo metadatos de: " + mp3File.getName() + " -> " + e.getMessage());
         }
+
+        return meta;
+    }
+
+    private static BufferedImage resize(BufferedImage img, int width, int height) {
+        BufferedImage resized = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = resized.createGraphics();
+        g.drawImage(img, 0, 0, width, height, null);
+        g.dispose();
+        return resized;
+    }
+
+    public static void shutdown() {
+        executor.shutdown();
     }
 }

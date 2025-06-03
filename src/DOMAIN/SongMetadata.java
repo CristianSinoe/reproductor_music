@@ -20,6 +20,9 @@ public class SongMetadata {
         this.year = year;
         this.coverImagePath = coverImagePath;
     }
+    
+    public SongMetadata() {
+    }
 
     public String getArtist() { 
         return artist;
