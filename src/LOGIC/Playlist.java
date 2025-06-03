@@ -18,6 +18,7 @@ import java.util.List;
  * @author sinoe
  */
 public class Playlist {
+    
     private String name;
     private List<Song> songs = new ArrayList<>();
 
@@ -81,17 +82,16 @@ public class Playlist {
             File songFile = song.getFile();
             if (songFile != null && songFile.exists()) {
                 song.setMetadata(DOMAIN.MetadataExtractor.extractMetadata(songFile));
-                System.out.println("🎵 Metadata restaurada: " + song.getName() + " -> " + song.getMetadata().getCoverImagePath());
+                System.out.println("METADATA RESTAURADA: " + song.getName() + " -> " + song.getMetadata().getCoverImagePath());
             } else {
-                System.out.println("⚠️ Archivo no encontrado: " + song.getFilePath());
+                System.out.println("ARCHIVO NO ENCONTRADO: " + song.getFilePath());
             }
         }
 
         return playlist;
     }
-}
-
-
+    }
+    
     private String sanitizeFileName(String input) {
         return input.replaceAll("[\\\\/:*?\"<>|]", "_");
     }

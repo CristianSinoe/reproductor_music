@@ -7,7 +7,6 @@ package GUI;
 import DOMAIN.Song;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
@@ -30,8 +29,8 @@ public class PlayerPanel extends JPanel {
     private final JTabbedPane tabbedPane = new JTabbedPane();
 
     private final JLabel lblCoverSmall = new JLabel();
-    private final JLabel lblTitle = new JLabel("Título canción");
-    private final JLabel lblArtist = new JLabel("Intérprete");
+    private final JLabel lblTitle = new JLabel("TITULO DE CANCION");
+    private final JLabel lblArtist = new JLabel("INTERPRETE");
     private final JSlider progressSlider = new JSlider();
     private final JButton btnPrevSmall = new JButton("⏮");
     private final JButton btnPlayPause = new JButton("▶️");
@@ -41,8 +40,8 @@ public class PlayerPanel extends JPanel {
     private final JButton btnPause = new JButton("⏸ PAUSA");
     private final JButton btnNext = new JButton("⏭ SIGUIENTE");
     private final JButton btnPrev = new JButton("⏮ ANTERIOR");
-    private final JButton btnPrevPage = new JButton("⬅ Página anterior");
-    private final JButton btnNextPage = new JButton("Página siguiente ➡");
+    private final JButton btnPrevPage = new JButton("⬅ PAGINA ANTERIOR");
+    private final JButton btnNextPage = new JButton("PAGINA SIGUIENTE ➡");
 
     private List<Song> allSongs = new ArrayList<>();
     private int currentPage = 0;
@@ -54,17 +53,15 @@ public class PlayerPanel extends JPanel {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
-        // Texto arriba que muestra canción ahora
         lblNowPlaying.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblNowPlaying.setHorizontalAlignment(SwingConstants.CENTER);
         lblNowPlaying.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(lblNowPlaying, BorderLayout.NORTH);
 
-        // Lista y paginación
         songList.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         songList.setCellRenderer(new SongListRenderer());
         JScrollPane scrollPane = new JScrollPane(songList);
-        scrollPane.setBorder(BorderFactory.createTitledBorder("🎶 CANCIONES"));
+        scrollPane.setBorder(BorderFactory.createTitledBorder("CANCIONES"));
 
         JPanel paginationPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         paginationPanel.add(btnPrevPage);
@@ -82,19 +79,18 @@ public class PlayerPanel extends JPanel {
 //        songsPanel.add(controls, BorderLayout.SOUTH);
 
         tabbedPane.addTab("CANCIONES", songsPanel);
-        tabbedPane.addTab("ALBUMES", new JLabel("PROXIMAMENTE..."));
-        tabbedPane.addTab("ARTISTAS", new JLabel("PROXIMAMENTE..."));
-        tabbedPane.addTab("AÑOS", new JLabel("PROXIMAMENTE..."));
-        tabbedPane.addTab("PLAYLIST", new JLabel("PROXIMAMENTE..."));
+//        tabbedPane.addTab("ALBUMES", new JLabel("PROXIMAMENTE..."));
+//        tabbedPane.addTab("ARTISTAS", new JLabel("PROXIMAMENTE..."));
+//        tabbedPane.addTab("AÑOS", new JLabel("PROXIMAMENTE..."));
+//        tabbedPane.addTab("PLAYLIST", new JLabel("PROXIMAMENTE..."));
 
         add(tabbedPane, BorderLayout.CENTER);
 
-        // Panel inferior con carátula, título, artista, barra y botones pequeños
         JPanel bottomPanel = new JPanel(new BorderLayout(10, 10));
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
         lblCoverSmall.setPreferredSize(new Dimension(80, 80));
-        lblCoverSmall.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // Cursor de mano para indicar clic
+        lblCoverSmall.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         bottomPanel.add(lblCoverSmall, BorderLayout.WEST);
 
         JPanel infoPanel = new JPanel();
@@ -121,7 +117,6 @@ public class PlayerPanel extends JPanel {
 
         add(bottomPanel, BorderLayout.SOUTH);
 
-        // --- LISTENER PARA REPRODUCIR CON ENTER ---
         songList.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -135,7 +130,6 @@ public class PlayerPanel extends JPanel {
             }
         });
 
-        // Listener para abrir ventana grande al hacer click en carátula pequeña
         lblCoverSmall.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -145,7 +139,6 @@ public class PlayerPanel extends JPanel {
             }
         });
 
-        // Listeners botones pequeños
         btnPlayPause.addActionListener(e -> {
             if (isPlaying) {
                 if (pauseAction != null) pauseAction.actionPerformed(e);
@@ -172,18 +165,16 @@ public class PlayerPanel extends JPanel {
         currentPage++;
         loadPage(currentPage);
     }
-});
-
-btnPrevPage.addActionListener(e -> {
-    if (currentPage > 0) {
-        currentPage--;
-        loadPage(currentPage);
+        });
+        
+        btnPrevPage.addActionListener(e -> {
+            if (currentPage > 0) {
+                currentPage--;
+                loadPage(currentPage);
+            }
+        });
     }
-});
 
-    }
-
-    // Listeners acciones botones grandes
     private ActionListener playAction;
     private ActionListener pauseAction;
     private ActionListener nextAction;
@@ -219,7 +210,7 @@ btnPrevPage.addActionListener(e -> {
 
         if (song != null && song.getMetadata() != null) {
             lblTitle.setText(song.getName());
-            lblArtist.setText(song.getMetadata().getArtist() != null ? song.getMetadata().getArtist() : "Desconocido");
+            lblArtist.setText(song.getMetadata().getArtist() != null ? song.getMetadata().getArtist() : "DESCONOCIDO");
 
             String coverPath = song.getMetadata().getCoverImagePath();
             if (coverPath != null && !coverPath.isBlank()) {
@@ -235,15 +226,15 @@ btnPrevPage.addActionListener(e -> {
                             SwingUtilities.invokeLater(() -> lblCoverSmall.setIcon(null));
                         }
                     } catch (Exception e) {
-                        System.err.println("Error cargando carátula: " + e.getMessage());
+                        System.err.println("ERROR CARGANDO CARATULA: " + e.getMessage());
                     }
                 }).start();
             } else {
                 lblCoverSmall.setIcon(null);
             }
         } else {
-            lblTitle.setText("Título desconocido");
-            lblArtist.setText("Intérprete desconocido");
+            lblTitle.setText("TITULO DESCONOCIDO");
+            lblArtist.setText("INTERPRETE DESCONOCIDO");
             lblCoverSmall.setIcon(null);
         }
     }
@@ -320,7 +311,7 @@ btnPrevPage.addActionListener(e -> {
                     int end = Math.min(i + blockSize, songs.size());
                     List<Song> block = songs.subList(i, end);
                     allSongs.addAll(block);
-                    publish(new ArrayList<>(block)); // enviar bloque para mostrar
+                    publish(new ArrayList<>(block));
                     Thread.sleep(30);
                 }
                 return null;
@@ -354,7 +345,6 @@ btnPrevPage.addActionListener(e -> {
         progressSlider.setValue(value);
     }
 
-    // Nueva interfaz para abrir ventana NowPlayingWindow
     public interface OpenNowPlayingWindowListener {
         void openNowPlaying();
     }

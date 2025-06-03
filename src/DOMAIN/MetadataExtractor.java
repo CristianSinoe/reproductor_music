@@ -5,9 +5,7 @@
 package DOMAIN;
 
 import com.mpatric.mp3agic.*;
-
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -24,7 +22,7 @@ import java.io.IOException;
  * @author sinoe
  */
 public class MetadataExtractor {
-
+    
     private static final int MAX_THREADS = 6;
     private static final ExecutorService executor = Executors.newFixedThreadPool(MAX_THREADS);
 
@@ -42,8 +40,8 @@ public class MetadataExtractor {
         try {
             Mp3File mp3 = new Mp3File(mp3File);
 
-            String artist = "Desconocido";
-            String album = "Desconocido";
+            String artist = "DESCONOCIDO";
+            String album = "DESCONOCIDO";
             int year = 0;
             String coverPath = null;
 
@@ -68,7 +66,7 @@ public class MetadataExtractor {
                             coverPath = coverFile.getAbsolutePath();
                         }
                     } catch (IOException ex) {
-                        System.err.println("Error redimensionando imagen: " + mp3File.getName() + " -> " + ex.getMessage());
+                        System.err.println("ERRO REDIMENSIONANDO IMAGEN: " + mp3File.getName() + " -> " + ex.getMessage());
                     }
                 }
             }
@@ -79,7 +77,7 @@ public class MetadataExtractor {
             meta.setCoverImagePath(coverPath);
 
         } catch (Exception e) {
-            System.err.println("Error leyendo metadatos de: " + mp3File.getName() + " -> " + e.getMessage());
+            System.err.println("ERROR LEYENDO METADATOS DE: " + mp3File.getName() + " -> " + e.getMessage());
         }
 
         return meta;

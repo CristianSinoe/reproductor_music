@@ -29,7 +29,7 @@ public class NowPlayingWindow extends JDialog {
     private final JButton btnPrev = new JButton();
     private final JButton btnPlayPause = new JButton();
     private final JButton btnNext = new JButton();
-    private final JButton btnClose = new JButton("X"); // Botón X sin icono
+    private final JButton btnClose = new JButton("X");
 
     private boolean isPlaying = false;
 
@@ -50,7 +50,6 @@ public class NowPlayingWindow extends JDialog {
         setLayout(new BorderLayout(60, 60));
         getContentPane().setBackground(Color.WHITE);
 
-        // Panel para botón cerrar (X) en la esquina superior derecha
         JPanel closePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         closePanel.setOpaque(false);
         btnClose.setFont(new Font("Segoe UI", Font.BOLD, 24));
@@ -66,15 +65,13 @@ public class NowPlayingWindow extends JDialog {
         closePanel.add(btnClose);
         add(closePanel, BorderLayout.NORTH);
 
-        // Carátula grande con tamaño fijo 500x500 y margen izquierdo
         lblCoverLarge.setPreferredSize(new Dimension(500, 500));
         lblCoverLarge.setHorizontalAlignment(SwingConstants.CENTER);
-        JPanel coverWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 40, 0)); // Margen a la izquierda
+        JPanel coverWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 40, 0));
         coverWrapper.setOpaque(false);
         coverWrapper.add(lblCoverLarge);
         add(coverWrapper, BorderLayout.WEST);
 
-        // Panel derecho (texto + barra + botones)
         JPanel infoPanel = new JPanel();
         infoPanel.setOpaque(false);
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
@@ -119,8 +116,7 @@ public class NowPlayingWindow extends JDialog {
 
         updateSongInfo(song);
         isPlaying = true;
-        //btnPlayPause.setText("⏸"); // Texto aquí no se usa porque el botón tiene icono, pero mantenemos para estado
-
+        
         progressTimer = new Timer(500, e -> updateProgress());
         progressTimer.start();
 
@@ -149,7 +145,7 @@ public class NowPlayingWindow extends JDialog {
             Image img = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
             return new ImageIcon(img);
         } catch (Exception e) {
-            System.err.println("Error loading icon from " + path + ": " + e.getMessage());
+            System.err.println("ERRO CARGANDO ICONO DE " + path + ": " + e.getMessage());
             return null;
         }
     }
@@ -184,7 +180,7 @@ public class NowPlayingWindow extends JDialog {
                 }
                 SwingUtilities.invokeLater(() -> lblCoverLarge.setIcon(null));
             } catch (Exception ex) {
-                System.err.println("Error cargando carátula grande: " + ex.getMessage());
+                System.err.println("ERROR CRGANDO CARATULA GRANDE: " + ex.getMessage());
                 SwingUtilities.invokeLater(() -> lblCoverLarge.setIcon(null));
             }
         }).start();

@@ -34,10 +34,10 @@ public class MainWindow extends JFrame {
     private boolean ignoreComboEvents = false;
 
     private JComboBox<String> playlistsCombo = new JComboBox<>();
-    private JButton btnCreatePlaylist = new JButton("NUEVA PLAYLIST");
-    private JButton btnDeletePlaylist = new JButton("ELIMINAR PLAYLIST");
-    private JButton btnRenamePlaylist = new JButton("RENOMBRAR PLAYLIST");
-    private JButton btnAddSongToPlaylist = new JButton("AÑADIR CANCIONES A LA PLAYLIST");
+//    private JButton btnCreatePlaylist = new JButton("NUEVA PLAYLIST");
+//    private JButton btnDeletePlaylist = new JButton("ELIMINAR PLAYLIST");
+//    private JButton btnRenamePlaylist = new JButton("RENOMBRAR PLAYLIST");
+//    private JButton btnAddSongToPlaylist = new JButton("AÑADIR CANCIONES A LA PLAYLIST");
 
     private Playlist activePlaylist;
 
@@ -45,20 +45,20 @@ public class MainWindow extends JFrame {
     private Timer progressTimer;
 
     public MainWindow() {
-        setTitle("🎵 REPRODUCTOR DE MUSICA");
+        setTitle("REPRODUCTOR DE MUSICA");
         setSize(700, 500);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        topPanel.add(new JLabel("PLAYLIST:"));
-        topPanel.add(playlistsCombo);
-        topPanel.add(btnCreatePlaylist);
-        topPanel.add(btnDeletePlaylist);
-        topPanel.add(btnRenamePlaylist);
-        topPanel.add(btnAddSongToPlaylist);
+//        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+//        topPanel.add(new JLabel("PLAYLIST:"));
+//        topPanel.add(playlistsCombo);
+//        topPanel.add(btnCreatePlaylist);
+//        topPanel.add(btnDeletePlaylist);
+//        topPanel.add(btnRenamePlaylist);
+//        topPanel.add(btnAddSongToPlaylist);
 
-        add(topPanel, BorderLayout.NORTH);
+//        add(topPanel, BorderLayout.NORTH);
         add(playerPanel, BorderLayout.CENTER);
 
         musicManager = new MusicManager();
@@ -71,7 +71,7 @@ public class MainWindow extends JFrame {
 
         loadSongsAndPlaylists(musicFolder);
         setupListeners();
-        setupProgressTimer();  // Inicializamos el timer para la barra de progreso
+        setupProgressTimer();
 
         addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
@@ -125,7 +125,6 @@ public class MainWindow extends JFrame {
                     setActivePlaylist(tempPlaylist);
                 } else {
                     activePlaylist.getSongs().addAll(chunks);
-                    // No resetear playlist aquí para no reiniciar índice
                 }
             }
 
@@ -169,7 +168,7 @@ public class MainWindow extends JFrame {
 
         System.out.println("PLAY LIST ACTIVA ESTABLECIDA: " + playlist.getName());
         System.out.println("CANCIONES CARGADAS EN LA PLAYLIST: " + playlist.getSongs().size());
-        System.out.println("Índice inicial: " + playbackManager.getCurrentIndex());
+        System.out.println("INDICE INICIAL: " + playbackManager.getCurrentIndex());
 
         playerPanel.setSongs(activePlaylist.getSongs());
 
@@ -222,51 +221,51 @@ public class MainWindow extends JFrame {
             NowPlayingWindow nowPlayingWindow = new NowPlayingWindow(MainWindow.this, currentSong, consumerPlayer);
             nowPlayingWindow.setVisible(true);
         }
-    }
-});
-
-
-        btnCreatePlaylist.addActionListener(e -> {
-            String name = JOptionPane.showInputDialog(this, "NOMBRE DE NUEVA PLAYLIST:");
-            if (name != null && !name.trim().isEmpty()) {
-                Playlist newPlaylist = new Playlist(name.trim());
-                try {
-                    playlistManager.savePlaylist(newPlaylist);
-                    playlistsCombo.addItem(newPlaylist.getName());
-                    playlistsCombo.setSelectedItem(newPlaylist.getName());
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(this, "ERROR CREANDO PLAYLIST: " + ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
-                }
             }
         });
 
-        btnDeletePlaylist.addActionListener(e -> {
-            if (activePlaylist == null || activePlaylist.getName().equals("TODAS LAS CANCIONES")) {
-                JOptionPane.showMessageDialog(this, "NO SE PUEDE ELIMINAR ESTA PLAYLIST.", "ATENCIÓN", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-            int res = JOptionPane.showConfirmDialog(this, "¿ELIMINAR PLAYLIST " + activePlaylist.getName() + "?", "CONFIRMAR", JOptionPane.YES_NO_OPTION);
-            if (res == JOptionPane.YES_OPTION) {
-                playlistManager.deletePlaylist(activePlaylist);
-                playlistsCombo.removeItem(activePlaylist.getName());
-                if (playlistsCombo.getItemCount() > 0) {
-                    playlistsCombo.setSelectedIndex(0);
-                }
-            }
-        });
+
+//        btnCreatePlaylist.addActionListener(e -> {
+//            String name = JOptionPane.showInputDialog(this, "NOMBRE DE NUEVA PLAYLIST:");
+//            if (name != null && !name.trim().isEmpty()) {
+//                Playlist newPlaylist = new Playlist(name.trim());
+//                try {
+//                    playlistManager.savePlaylist(newPlaylist);
+//                    playlistsCombo.addItem(newPlaylist.getName());
+//                    playlistsCombo.setSelectedItem(newPlaylist.getName());
+//                } catch (IOException ex) {
+//                    JOptionPane.showMessageDialog(this, "ERROR CREANDO PLAYLIST: " + ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+//                }
+//            }
+//        });
+//
+//        btnDeletePlaylist.addActionListener(e -> {
+//            if (activePlaylist == null || activePlaylist.getName().equals("TODAS LAS CANCIONES")) {
+//                JOptionPane.showMessageDialog(this, "NO SE PUEDE ELIMINAR ESTA PLAYLIST.", "ATENCIÓN", JOptionPane.WARNING_MESSAGE);
+//                return;
+//            }
+//            int res = JOptionPane.showConfirmDialog(this, "¿ELIMINAR PLAYLIST " + activePlaylist.getName() + "?", "CONFIRMAR", JOptionPane.YES_NO_OPTION);
+//            if (res == JOptionPane.YES_OPTION) {
+//                playlistManager.deletePlaylist(activePlaylist);
+//                playlistsCombo.removeItem(activePlaylist.getName());
+//                if (playlistsCombo.getItemCount() > 0) {
+//                    playlistsCombo.setSelectedIndex(0);
+//                }
+//            }
+//        });
 
         playerPanel.setPlayAction(e -> {
-            System.out.println("Play presionado");
+            System.out.println("PLAY PRESIONADO");
             if (consumerPlayer != null) consumerPlayer.play();
         });
 
         playerPanel.setPauseAction(e -> {
-            System.out.println("Pause presionado");
+            System.out.println("PAUSA PRESIONADO");
             if (consumerPlayer != null) consumerPlayer.pause();
         });
 
         playerPanel.setNextAction(e -> {
-            System.out.println("Next presionado");
+            System.out.println("SIGUIENTE PRESIONADO");
             if (consumerPlayer != null) {
                 playbackManager.next();
                 consumerPlayer.changeSong();
@@ -275,7 +274,7 @@ public class MainWindow extends JFrame {
         });
 
         playerPanel.setPrevAction(e -> {
-            System.out.println("Prev presionado");
+            System.out.println("ANTERIOR PRESIONADO");
             if (consumerPlayer != null) {
                 playbackManager.previous();
                 consumerPlayer.changeSong();
@@ -284,7 +283,7 @@ public class MainWindow extends JFrame {
         });
 
         playerPanel.setPlaySongListener(index -> {
-            System.out.println("Canción seleccionada con índice: " + index);
+            System.out.println("CANCION SELECCIONADA CON INDICE: " + index);
             if (consumerPlayer != null) {
                 playbackManager.playSongAtIndex(index);
                 consumerPlayer.changeSong();

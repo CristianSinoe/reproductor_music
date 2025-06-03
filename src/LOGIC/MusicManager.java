@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-
-
 /**
  *
  * @author sinoe
@@ -35,19 +33,18 @@ public class MusicManager {
                     SongMetadata metadata = MetadataExtractor.extractMetadata(file);
                     Song song = new Song(file.getName(), file, metadata);
 
-                    // Obtener duración con MP3agic
                     try {
                         Mp3File mp3 = new Mp3File(file);
                         int durationMs = (int) (mp3.getLengthInSeconds() * 1000);
                         song.setDurationMillis(durationMs);
                     } catch (Exception e) {
-                        System.err.println("No se pudo obtener duración para: " + file.getName());
+                        System.err.println("NO SE PUDO OBTENER DURACION PARA: " + file.getName());
                         song.setDurationMillis(0);
                     }
 
-                    System.out.println("Cargando canción: " + song.getName());
-                    System.out.println("Cover path asignado: " + song.getMetadata().getCoverImagePath());
-                    System.out.println("Duración (ms): " + song.getDurationMillis());
+                    System.out.println("CARGANDO CANCION: " + song.getName());
+                    System.out.println("COVER PATH ASIGNADO: " + song.getMetadata().getCoverImagePath());
+                    System.out.println("DURACION (MS): " + song.getDurationMillis());
 
                     songs.add(song);
                 }
@@ -77,20 +74,19 @@ public class MusicManager {
             if (file.getName().toLowerCase().endsWith(".mp3")) {
                 SongMetadata metadata = MetadataExtractor.extractMetadata(file);
                 Song song = new Song(metadata.getArtist(), metadata.getAlbum(), metadata.getYear(), metadata.getCoverImagePath(), file.getAbsolutePath());
-                // Obtener duración
                 try {
                     Mp3File mp3 = new Mp3File(file);
                     int durationMs = (int) (mp3.getLengthInSeconds() * 1000);
                     song.setDurationMillis(durationMs);
                 } catch (Exception e) {
-                    System.err.println("No se pudo obtener duración para: " + file.getName());
+                    System.err.println("NO SE PUDO OBTENER DURACION PARA: " + file.getName());
                     song.setDurationMillis(0);
                 }
                 allSongs.add(song);
                 return song;
             }
         } catch (Exception e) {
-            System.err.println("Error cargando metadata para: " + file.getName());
+            System.err.println("ERROR CARGANDO METADATA PARA: " + file.getName());
             e.printStackTrace();
         }
         return null;

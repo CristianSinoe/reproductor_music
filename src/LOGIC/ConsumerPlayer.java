@@ -28,11 +28,10 @@ public class ConsumerPlayer extends Thread {
 
     private Thread playThread;
 
-    // Para controlar progreso basado en tiempo
     private long startTime = 0;
     private long pausedTimeAccumulated = 0;
     private long pauseStartTime = 0;
-    private int durationMillis = 0; // Debes establecer la duración al cargar la canción
+    private int durationMillis = 0;
 
     public interface NowPlayingCallback {
         void onSongChanged(String songName);
@@ -69,7 +68,7 @@ public class ConsumerPlayer extends Thread {
             pauseStartTime = System.currentTimeMillis();
             synchronized (playerLock) {
                 if (currentPlayer != null) {
-                    currentPlayer.close();  // Pausa efectiva (detener la reproducción)
+                    currentPlayer.close();
                 }
             }
         }
@@ -79,7 +78,7 @@ public class ConsumerPlayer extends Thread {
         if (paused) {
             paused = false;
             pausedTimeAccumulated += System.currentTimeMillis() - pauseStartTime;
-            songChanged = true;  // Forzar reinicio de reproducción
+            songChanged = true;
             notify();
             interrupt();
         }
@@ -100,7 +99,6 @@ public class ConsumerPlayer extends Thread {
         interrupt();
     }
 
-    // NUEVOS métodos públicos para que NowPlayingWindow pueda controlar la reproducción
     public Song getCurrentSong() {
         return playbackManager.getCurrentSong();
     }
@@ -141,11 +139,10 @@ public class ConsumerPlayer extends Thread {
                     javax.swing.SwingUtilities.invokeLater(() -> callback.onSongChanged(song.getName()));
                 }
 
-                // Aquí debes establecer la duración de la canción si tienes ese dato
                 if (song.getDurationMillis() > 0) {
                     setDuration(song.getDurationMillis());
                 } else {
-                    setDuration(0); // Sin dato
+                    setDuration(0);
                 }
 
                 startTime = System.currentTimeMillis();
@@ -216,7 +213,6 @@ public class ConsumerPlayer extends Thread {
                 }
 
             } catch (InterruptedException e) {
-                // Ignorar interrupciones
             } catch (Exception e) {
                 e.printStackTrace();
             }

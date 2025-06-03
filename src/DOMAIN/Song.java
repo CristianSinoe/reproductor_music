@@ -16,7 +16,7 @@ public class Song {
     private transient File file;   
     private String filePath;   
     private SongMetadata metadata;
-    private int durationMillis = 0; // Duración en milisegundos
+    private int durationMillis = 0;
 
     public Song(String name, File file, SongMetadata metadata) {
         this.name = name;
@@ -25,7 +25,8 @@ public class Song {
         this.metadata = metadata;
     }
 
-    public Song() {}
+    public Song() {
+    }
 
     public Song(String artist, String album, int year, String coverImagePath, String filePath) {
         this.metadata = new SongMetadata(artist, album, year, coverImagePath);
@@ -33,7 +34,6 @@ public class Song {
         this.name = new File(filePath).getName();
     }
 
-    // Nuevo getter y setter para duración
     public int getDurationMillis() {
         return durationMillis;
     }
@@ -42,7 +42,6 @@ public class Song {
         this.durationMillis = durationMillis;
     }
 
-    // Getters y setters existentes
     public String getName() {
         return name;
     }

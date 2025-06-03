@@ -14,7 +14,7 @@ import java.util.Map;
  * @author sinoe
  */
 public class ImageCache {
-    private static final int MAX_ENTRIES = 100; // Puedes ajustar este valor
+    private static final int MAX_ENTRIES = 100;
     private static final Map<String, Image> cache = new LinkedHashMap<>(MAX_ENTRIES, 0.75f, true) {
         @Override
         protected boolean removeEldestEntry(Map.Entry<String, Image> eldest) {

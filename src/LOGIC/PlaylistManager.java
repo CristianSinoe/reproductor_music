@@ -42,8 +42,7 @@ public class PlaylistManager {
         }
     }
     return playlists;
-}
-
+    }
 
     public void savePlaylist(Playlist playlist) throws IOException {
         playlist.saveToFile(dir);

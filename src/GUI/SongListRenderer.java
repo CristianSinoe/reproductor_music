@@ -10,22 +10,13 @@ import DOMAIN.Song;
 import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  *
  * @author sinoe
  */
-import javax.swing.*;
-import java.awt.*;
-import java.io.File;
-import java.net.URL;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 public class SongListRenderer extends JPanel implements ListCellRenderer<Song> {
 
     private static final ImageIcon DEFAULT_ICON = new ImageIcon(
@@ -34,15 +25,13 @@ public class SongListRenderer extends JPanel implements ListCellRenderer<Song> {
 
     private static final int IMAGE_SIZE = 200;
 
-    // Cache con límite de 200 entradas
     private static final Map<String, ImageIcon> coverCache = new LinkedHashMap<>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry<String, ImageIcon> eldest) {
-            return size() > 20;
+            return size() > 200;
         }
     };
 
-    // Pool de hilos fijo para cargar imágenes sin saturar
     private static final ExecutorService imageLoaderPool = Executors.newFixedThreadPool(5);
 
     private JLabel lblCover = new JLabel();
@@ -65,7 +54,7 @@ public class SongListRenderer extends JPanel implements ListCellRenderer<Song> {
 
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
     }
-
+    
     @Override
     public Component getListCellRendererComponent(
             JList<? extends Song> list,
@@ -84,7 +73,6 @@ public class SongListRenderer extends JPanel implements ListCellRenderer<Song> {
             if (coverCache.containsKey(coverPath)) {
                 lblCover.setIcon(coverCache.get(coverPath));
             } else {
-                // Enviar carga al pool de hilos
                 imageLoaderPool.submit(() -> {
                     try {
                         File file = new File(coverPath);
@@ -93,7 +81,6 @@ public class SongListRenderer extends JPanel implements ListCellRenderer<Song> {
                             Image img = icon.getImage().getScaledInstance(IMAGE_SIZE, IMAGE_SIZE, Image.SCALE_SMOOTH);
                             ImageIcon scaledIcon = new ImageIcon(img);
 
-                            // Actualizar UI en el hilo de Swing
                             SwingUtilities.invokeLater(() -> {
                                 coverCache.put(coverPath, scaledIcon);
                                 lblCover.setIcon(scaledIcon);
@@ -105,7 +92,7 @@ public class SongListRenderer extends JPanel implements ListCellRenderer<Song> {
                             });
                         }
                     } catch (Exception e) {
-                        System.err.println("Error cargando imagen en hilo: " + e.getMessage());
+                        System.err.println("ERROR CARGANDO IMAGEN EN HILO: " + e.getMessage());
                     }
                 });
             }
