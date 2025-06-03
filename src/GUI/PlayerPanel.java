@@ -46,7 +46,7 @@ public class PlayerPanel extends JPanel {
 
     private List<Song> allSongs = new ArrayList<>();
     private int currentPage = 0;
-    private static final int PAGE_SIZE = 50;
+    private static final int PAGE_SIZE = 100;
 
     private boolean isPlaying = false;
 
@@ -165,6 +165,22 @@ public class PlayerPanel extends JPanel {
         btnNextSmall.addActionListener(e -> {
             if (nextAction != null) nextAction.actionPerformed(e);
         });
+        
+        btnNextPage.addActionListener(e -> {
+    int totalPages = (int) Math.ceil((double) allSongs.size() / PAGE_SIZE);
+    if (currentPage < totalPages - 1) {
+        currentPage++;
+        loadPage(currentPage);
+    }
+});
+
+btnPrevPage.addActionListener(e -> {
+    if (currentPage > 0) {
+        currentPage--;
+        loadPage(currentPage);
+    }
+});
+
     }
 
     // Listeners acciones botones grandes
